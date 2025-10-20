@@ -35,11 +35,7 @@ int main(){
 	myfile.open("assenze.txt", ios :: in);
 
 	if(!myfile.is_open()){
-<<<<<<< HEAD
-		cout << "Errore di apertura file in input" << endl;
-=======
-		cout<<"Errore di apertura miniera in input"<<endl;
->>>>>>> 38a49512d2a4fbeaefe7a8c2f7a693c0cbe40e54
+		cout<<"Errore di apertura file in input"<<endl;
 		return 127;
 	}
 
@@ -64,18 +60,18 @@ int main(){
 	do{
 		if(!used){
 			schoolSetting(totH);
-			weekSetting(dayH,weekQ,weeklyH);
+			weekSetting(dayH, weekQ, weeklyH);
 			setAbsence(absH);
 		
 			used=true;
 		}
 		
-		posAbsH = (totH*(absPerc / 100)) - absH;
+		posAbsH = (totH * (absPerc / 100)) - absH;
 		
 		cout<<"Puoi ancora assentarti:" << endl;
 		cout<<posAbsH<<" ore" << endl;
-		for(i=0;i<weekQ;i++){
-			cout<<posAbsH/dayH[i] << " giorni da " << dayH[i] << " ore" << endl;
+		for(i = 0 ; i < weekQ ; i++){
+			cout << posAbsH / dayH[i] << " giorni da " << dayH[i] << " ore" << endl;
 		}
 		cout << posAbsH / weeklyH << " settimane" << "\n\n";
 		
