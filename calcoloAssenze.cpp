@@ -35,7 +35,7 @@ int main(){
 	myfile.open("assenze.txt", ios :: in);
 
 	if(!myfile.is_open()){
-		cout<<"Errore di apertura file in input"<<endl;
+		cout << "Errore di apertura file in input" << endl;
 		return 127;
 	}
 
@@ -110,10 +110,10 @@ int main(){
 		}
 	}while(command!='e'&&'y');
 	
-	myfile.open("assenze.txt",ios::out);
+	myfile.open("assenze.txt", ios :: out);
 	
 	if(!myfile.is_open()){
-		cout<<"Errore apertura file in output"<<"\n\n";
+		cout << "Errore apertura file in output"<<"\n\n";
 		return 127;
 	}
 	
@@ -151,9 +151,9 @@ void weekSetting(int difH[], int& Q, int& wlyH){
 		
 		wlyH+=H;
 		
-		for(j=0,flag=false;j<Q;j++){
-			if(difH[j]==H){
-				flag=true;		
+		for(j = 0, flag = false ; j < Q ; j++){
+			if(difH[j] == H){
+				flag = true;		
 			}
 		}
 		
@@ -206,14 +206,14 @@ return;
 void setAbsence(float& H){
 	system("cls");
 	
-	cout<<"Inserisci le ore di assenza fatte fin ora:"<<endl;
-	cin>>H;
+	cout << "Inserisci le ore di assenza fatte fin ora:" << endl;
+	cin >> H;
 	
 return;
 }
 
 string week(int i){
-	string days[]{"lunedi","martedi","mercoledi","giovedi","venerdi","sabato","domenica"};
+	string days[]{"lunedi", "martedi", "mercoledi", "giovedi", "venerdi", "sabato", "domenica"};
 	
 return days[i];
 }
