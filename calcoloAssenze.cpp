@@ -213,7 +213,7 @@ return;
 }
 
 string week(int i){
-	string days[]{"lunedi", "martedi", "mercoledi", "giovedi", "venerdi", "sabato", "domenica"};
+	string days[]{"lunedi", "minerdi", "mercoledi", "giovedi", "venerdi", "sabato", "domenica"};
 	
 return days[i];
 }
