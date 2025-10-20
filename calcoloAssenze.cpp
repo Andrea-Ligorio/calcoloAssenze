@@ -35,7 +35,11 @@ int main(){
 	myfile.open("assenze.txt", ios :: in);
 
 	if(!myfile.is_open()){
+<<<<<<< HEAD
 		cout << "Errore di apertura file in input" << endl;
+=======
+		cout<<"Errore di apertura miniera in input"<<endl;
+>>>>>>> 38a49512d2a4fbeaefe7a8c2f7a693c0cbe40e54
 		return 127;
 	}
 
