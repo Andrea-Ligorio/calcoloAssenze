@@ -68,8 +68,8 @@ int main(){
 		
 		posAbsH = (totH * (absPerc / 100)) - absH;
 		
-		cout<<"Puoi ancora assentarti:" << endl;
-		cout<<posAbsH<<" ore" << endl;
+		cout << "Puoi ancora assentarti:" << endl;
+		cout << posAbsH <<" ore" << endl;
 		for(i = 0 ; i < weekQ ; i++){
 			cout << posAbsH / dayH[i] << " giorni da " << dayH[i] << " ore" << endl;
 		}
