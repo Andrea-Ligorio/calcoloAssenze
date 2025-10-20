@@ -33,7 +33,7 @@ int main(){
 	myfile.open("assenze.txt",ios::in);
 
 	if(!myfile.is_open()){
-		cout<<"Errore di apertura file in input"<<endl;
+		cout<<"Errore di apertura miniera in input"<<endl;
 		return 127;
 	}
 
