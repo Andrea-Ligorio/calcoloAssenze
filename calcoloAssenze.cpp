@@ -18,6 +18,7 @@ void schoolSetting(float& H);
 void setAbsence(float& H);
 
 int save(string fileName, bool used, float totH, int weeklyH, int weekQ, int dayH[], float absH);
+int reset(string fileName);
 
 int main(){
 	const float absPerc=25;//percentuale di assenze su le ore totali che si possono fare
@@ -99,7 +100,7 @@ int main(){
 				setAbsence(absH);
 				break;
 			case 'e'://exit
-				cout << "salvataggio" << endl;
+				cout << "Arrivederci" << endl;
 				break;
 			case 'r'://reset
 				cout << "Sicuro di voler resettare tutti i parametri? [y] [n]:" << endl;
@@ -113,7 +114,11 @@ int main(){
 
 		save(nomeFile, used, totH, weeklyH, weekQ, dayH, absH);
 
-	}while(command!='e'&&'y');
+	}while(command!='e'&&command!='y');
+
+	if(command=='y'){
+		reset(nomeFile);
+	}
 	
 return 0;
 }
@@ -137,6 +142,22 @@ int save(string fileName, bool used, float totH, int weeklyH, int weekQ, int day
 		ofile << dayH[i] << endl;
 	}
 	ofile << absH;
+
+	ofile.close();
+
+return 0;
+}
+
+int reset(string fileName){
+	ofstream ofile;
+	ofile.open(fileName);
+	
+	if(!ofile.is_open()){
+		cout << "Errore apertura file in reset"<<"\n\n";
+		return 127;
+	}
+
+	ofile << 0;
 
 	ofile.close();
 
