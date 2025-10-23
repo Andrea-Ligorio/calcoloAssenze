@@ -15,8 +15,6 @@ void weekSetting(int difH[], int& Q, int& wlyH);
 void schoolSetting(float& H);
 void setAbsence(float& H);
 
-
-
 int main(){
 	const float absPerc=25;//percentuale di assenze su le ore totali che si possono fare
 	
@@ -31,12 +29,15 @@ int main(){
 	
 	int i;
 	
+	ofstream ofile;
 	fstream myfile;
 	myfile.open("assenze.txt", ios :: in);
 
-	if(!myfile.is_open()){
-		cout << "Errore di apertura file in input" << endl;
-		return 127;
+
+	while(!myfile.is_open()){
+		ofile.open("assenze.txt");
+		ofile << 0;
+		ofile.close();
 	}
 
 	myfile >> used;
@@ -206,7 +207,7 @@ return;
 void setAbsence(float& H){
 	system("cls");
 	
-	cout << "Inserisci le ore di assenza fatte fin ora:" << endl;
+	cout << "Inserisci le ore di assenza fatte fino ad ora:" << endl;
 	cin >> H;
 	
 return;
