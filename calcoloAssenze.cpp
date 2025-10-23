@@ -17,9 +17,11 @@ void weekSetting(int difH[], int& Q, int& wlyH);
 void schoolSetting(float& H);
 void setAbsence(float& H);
 
+int save(string fileName, bool used, float totH, int weeklyH, int weekQ, int dayH[], float absH);
+
 int main(){
 	const float absPerc=25;//percentuale di assenze su le ore totali che si possono fare
-	
+
 	float totH = 0;//ore totali da fare in un anno
 	float absH = 0;//ore di assenza fatte fino ad ora
 	
@@ -31,13 +33,15 @@ int main(){
 	
 	int i;
 	
+	string nomeFile = "assenze.txt";
+
 	ofstream ofile;
 	fstream myfile;
-	myfile.open("assenze.txt", ios :: in);
+	myfile.open(nomeFile, ios :: in);
 
 
 	while(!myfile.is_open()){
-		ofile.open("assenze.txt");
+		ofile.open(nomeFile);
 		ofile << 0;
 		ofile.close();
 	}
@@ -66,12 +70,13 @@ int main(){
 			weekSetting(dayH, weekQ, weeklyH);
 			setAbsence(absH);
 		
-			used=true;
+			used = true;
 		}
 		
 		posAbsH = (totH * (absPerc / 100)) - absH;
 		
 		cout << "Puoi ancora assentarti:" << endl;
+
 		cout << posAbsH <<" ore" << endl;
 		for(i = 0 ; i < weekQ ; i++){
 			cout << posAbsH / dayH[i] << " giorni da " << dayH[i] << " ore" << endl;
@@ -105,25 +110,36 @@ int main(){
 				command='z';
 				break;
 		}
+
+		save(nomeFile, used, totH, weeklyH, weekQ, dayH, absH);
+
 	}while(command!='e'&&'y');
 	
-	myfile.open("assenze.txt", ios :: out);
+return 0;
+}
+
+int save(string fileName, bool used, float totH, int weeklyH, int weekQ, int dayH[], float absH){
+	int i;
 	
-	if(!myfile.is_open()){
+	ofstream ofile;
+	ofile.open(fileName);
+
+	if(!ofile.is_open()){
 		cout << "Errore apertura file in output"<<"\n\n";
 		return 127;
 	}
-	
-	myfile << used << endl;
-	myfile << totH << endl;
-	myfile << weeklyH << endl;
-	myfile << weekQ << endl;
-	for(i = 0 ; i < weekQ ; i++)
-		myfile << dayH[i]<<endl;
-	myfile << absH;
-	
-	myfile.close();
-	
+
+	ofile << used << endl;
+	ofile << totH << endl;
+	ofile << weeklyH << endl;
+	ofile << weekQ << endl;
+	for(i = 0 ; i < weekQ ; i++){
+		ofile << dayH[i] << endl;
+	}
+	ofile << absH;
+
+	ofile.close();
+
 return 0;
 }
 
