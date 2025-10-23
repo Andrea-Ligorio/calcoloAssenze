@@ -11,6 +11,8 @@ using namespace std;
 
 string week(int i);
 
+void menu();
+
 void weekSetting(int difH[], int& Q, int& wlyH);
 void schoolSetting(float& H);
 void setAbsence(float& H);
@@ -80,13 +82,7 @@ int main(){
 		
 		switch (command){
 			case 'h'://help
-				system("cls");
-				
-				cout << "- w -> setta le ore di ogni giorno della settimana" << endl;
-				cout << "- s -> setta le ore totali dell'anno scolastico" << endl;
-				cout << "- a -> setta le ore di assenza effettuate fino ad ora" << endl;
-				cout << "- e -> chiude il programma salvando i dati inseriti" << endl;
-				cout << "- r -> resetta i dati e chiude il programma" << "\n\n";
+				menu();
 				break;
 			case 'w'://week
 				weekSetting(dayH,weekQ,weeklyH);
@@ -129,6 +125,18 @@ int main(){
 	myfile.close();
 	
 return 0;
+}
+
+void menu(){
+	system("cls");
+				
+	cout << "- w -> setta le ore di ogni giorno della settimana" << endl;
+	cout << "- s -> setta le ore totali dell'anno scolastico" << endl;
+	cout << "- a -> setta le ore di assenza effettuate fino ad ora" << endl;
+	cout << "- e -> chiude il programma salvando i dati inseriti" << endl;
+	cout << "- r -> resetta i dati e chiude il programma" << "\n\n";
+
+return;
 }
 
 void weekSetting(int difH[], int& Q, int& wlyH){
