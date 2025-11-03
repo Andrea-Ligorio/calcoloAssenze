@@ -17,11 +17,11 @@ void weekSetting(int difH[], int& Q, int& wlyH);
 void schoolSetting(float& H);
 void setAbsence(float& H);
 
-int save(string fileName, bool used, float totH, int weeklyH, int weekQ, int dayH[], float absH);
-int reset(string fileName);
+bool import(string filePath, float& totH, int& weeklyH, int& weekQ, int dayH[], float absH);
+int save(string filePath, float totH, int weeklyH, int weekQ, int dayH[], float absH);
 
 int main(){
-	const float absPerc=25;//percentuale di assenze su le ore totali che si possono fare
+	const float absPerc=25;//percentuale di assenze sulle ore totali che si possono fare
 
 	float totH = 0;//ore totali da fare in un anno
 	float absH = 0;//ore di assenza fatte fino ad ora
@@ -30,52 +30,27 @@ int main(){
 	int dayH[7];//array che salva ogni quantita giornaliera di ore diversa
 	int weeklyH = 0;//ore settimanali
 	
-	bool used;//stato che ci fa capire se i dati sono gia stati settati
+	float posAbsH;//ore di assenza che si possono ancora fare
+	
+	const string percorsoFile = "C:\\Users\\Andrea\\programmazione\\progetti\\calcoloAssenze\\assenze.txt";//percorso del file su cui eseguire i salvataggi
+
+	if(!import(percorsoFile, totH, weeklyH,	weekQ, dayH, absH)){
+		schoolSetting(totH);
+		weekSetting(dayH, weekQ, weeklyH);
+		setAbsence(absH);
+	}
 	
 	int i;
-	
-	string nomeFile = "assenze.txt";
-
-	ofstream ofile;
-	fstream myfile;
-	myfile.open(nomeFile, ios :: in);
-
-
-	while(!myfile.is_open()){
-		ofile.open(nomeFile);
-		ofile << 0;
-		ofile.close();
-	}
-
-	myfile >> used;
-	if(used){
-		myfile >> totH;
-		myfile >> weeklyH;
-		myfile >> weekQ;
-		for(i = 0 ; i < weekQ ; i++)
-			myfile >> dayH[i];
-		myfile >> absH;	
-	}
-
-	
-	myfile.close();
-	
-	float posAbsH;//ore di assenza che si possono ancora fare
-
-	
 	char command;
 	
 	do{
-		if(!used){
-			schoolSetting(totH);
-			weekSetting(dayH, weekQ, weeklyH);
-			setAbsence(absH);
-		
-			used = true;
+		if(save(percorsoFile, totH, weeklyH, weekQ, dayH, absH) == 127){
+			cout << "Errore durante il salvataggio" << endl;
+			return 127;
 		}
 		
 		posAbsH = (totH * (absPerc / 100)) - absH;
-		
+
 		cout << "Puoi ancora assentarti:" << endl;
 
 		cout << posAbsH <<" ore" << endl;
@@ -103,8 +78,8 @@ int main(){
 				cout << "Arrivederci" << endl;
 				break;
 			case 'r'://reset
-				cout << "Sicuro di voler resettare tutti i parametri? [y] [n]:" << endl;
-				cin>>command;
+				system(("rm " + percorsoFile).c_str());
+				cout << "Reset effettuato" << endl;
 				break;
 			default:
 				cout<<"Comando non riconosciuto"<<endl;
@@ -112,54 +87,61 @@ int main(){
 				break;
 		}
 
-		save(nomeFile, used, totH, weeklyH, weekQ, dayH, absH);
+		
 
-	}while(command!='e'&&command!='y');
+	}while(command!='e'&&command!='r');
 
-	if(command=='y'){
-		reset(nomeFile);
-	}
-	
 return 0;
 }
 
-int save(string fileName, bool used, float totH, int weeklyH, int weekQ, int dayH[], float absH){
+bool import(string filePath, float& totH, int& weeklyH, int& weekQ, int dayH[], float absH){
+	bool used;
 	int i;
 	
-	ofstream ofile;
-	ofile.open(fileName);
+	fstream file;
 
-	if(!ofile.is_open()){
+	file.open(filePath, ios :: in);
+
+	if(!file.is_open()){
+		file.open(filePath, ios :: out);
+		used = false;
+	} else{
+		file >> totH;
+		file >> weeklyH;
+		file >> weekQ;
+		for(i = 0 ; i < weekQ ; i++){
+			file >> dayH[i];
+		}
+		file >> absH;
+
+		used = true;
+	}
+
+	file.close();
+
+return used;
+}
+
+int save(string filePath, float totH, int weeklyH, int weekQ, int dayH[], float absH){
+	int i;
+	
+	fstream file;
+	file.open(filePath, ios :: out);
+
+	if(!file.is_open()){
 		cout << "Errore apertura file in output"<<"\n\n";
 		return 127;
 	}
 
-	ofile << used << endl;
-	ofile << totH << endl;
-	ofile << weeklyH << endl;
-	ofile << weekQ << endl;
+	file << totH << endl;
+	file << weeklyH << endl;
+	file << weekQ << endl;
 	for(i = 0 ; i < weekQ ; i++){
-		ofile << dayH[i] << endl;
+		file << dayH[i] << endl;
 	}
-	ofile << absH;
+	file << absH;
 
-	ofile.close();
-
-return 0;
-}
-
-int reset(string fileName){
-	ofstream ofile;
-	ofile.open(fileName);
-	
-	if(!ofile.is_open()){
-		cout << "Errore apertura file in reset"<<"\n\n";
-		return 127;
-	}
-
-	ofile << 0;
-
-	ofile.close();
+	file.close();
 
 return 0;
 }
