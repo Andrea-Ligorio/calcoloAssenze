@@ -32,7 +32,7 @@ int main(){
 	
 	float posAbsH;//ore di assenza che si possono ancora fare
 	
-	const string percorsoFile = "C:\\Users\\Andrea\\programmazione\\progetti\\calcoloAssenze\\assenze.txt";//percorso del file su cui eseguire i salvataggi
+	const string percorsoFile = "assenze.txt";//percorso del file su cui eseguire i salvataggi
 
 	if(!import(percorsoFile, totH, weeklyH,	weekQ, dayH, absH)){
 		schoolSetting(totH);
