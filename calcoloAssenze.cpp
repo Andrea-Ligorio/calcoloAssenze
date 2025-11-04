@@ -105,6 +105,8 @@ bool import(string filePath, float& totH, int& weeklyH, int& weekQ, int dayH[], 
 	if(!file.is_open()){
 		file.open(filePath, ios :: out);
 		used = false;
+	} else if(file.peek() == EOF){
+		used = false;
 	} else{
 		file >> totH;
 		file >> weeklyH;
