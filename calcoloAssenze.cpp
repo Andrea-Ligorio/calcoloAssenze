@@ -6,6 +6,7 @@
 #include <iostream>
 #include <string>
 #include <fstream>
+#include <iomanip>
 
 using namespace std;
 
@@ -21,7 +22,8 @@ bool import(string filePath, float& totH, int& weeklyH, int& weekQ, int dayH[], 
 int save(string filePath, float totH, int weeklyH, int weekQ, int dayH[], float absH);
 
 int main(){
-	const float absPerc=25;//percentuale di assenze sulle ore totali che si possono fare
+	const int width = 27;
+	const float absPerc = 25;//percentuale di assenze sulle ore totali che si possono fare
 
 	float totH = 0;//ore totali da fare in un anno
 	float absH = 0;//ore di assenza fatte fino ad ora
@@ -51,13 +53,15 @@ int main(){
 		
 		posAbsH = (totH * (absPerc / 100)) - absH;
 
-		cout << "Puoi ancora assentarti:" << endl;
+		cout << "___________________________\n|" << endl;
+		cout << "| " << "Puoi ancora assentarti:" << endl;
 
-		cout << posAbsH <<" ore" << endl;
+		cout << "| " << posAbsH <<" ore" << endl;
 		for(i = 0 ; i < weekQ ; i++){
-			cout << posAbsH / dayH[i] << " giorni da " << dayH[i] << " ore" << endl;
+			cout << "| " << fixed << setprecision(1) << posAbsH / dayH[i] << " giorni da " << dayH[i] << " ore" << endl;
 		}
-		cout << posAbsH / weeklyH << " settimane" << "\n\n";
+		cout << "| " << posAbsH / weeklyH << " settimane" << "\n|__________________________"<< "\n\n";
+		cout << "Per visualizzare i comandi [h]" << "\n\n";
 		
 		cin >> command;
 		
@@ -80,6 +84,11 @@ int main(){
 			case 'r'://reset
 				system(("rm " + percorsoFile).c_str());
 				cout << "Reset effettuato" << endl;
+				break;
+			case 'm'://mine mode
+				for(i = 0 ; i < 10 ; i++){
+					system("start https://youtu.be/e5sgt5kdg0s?t=3");
+				}
 				break;
 			default:
 				cout<<"Comando non riconosciuto"<<endl;
@@ -243,7 +252,7 @@ return;
 }
 
 string week(int i){
-	string days[]{"lunedi", "minerdi", "mercoledi", "giovedi", "venerdi", "sabato", "domenica"};
+	string days[]{"lunedi", "martedi", "mercoledi", "giovedi", "venerdi", "sabato", "domenica"};
 	
 return days[i];
 }
