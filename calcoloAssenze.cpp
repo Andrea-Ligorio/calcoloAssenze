@@ -10,19 +10,27 @@
 
 using namespace std;
 
+//restituisce il nome del giorno della settimana corrispondente all'indice inserito
 string week(int i);
 
+void home();
+//stampa i comandi disponibili
 void menu();
 
+//prende l'input dall'utente controllando che sia compreso nei valori dei parametri
+void check(int& inserimento, int min, int max);
+
+//imposta 
 void weekSetting(int difH[], int& Q, int& wlyH);
 void schoolSetting(float& H);
-void setAbsence(float& H);
+void setAbsence(float& H, float totH);
 
-bool import(string filePath, float& totH, int& weeklyH, int& weekQ, int dayH[], float absH);
-int save(string filePath, float totH, int weeklyH, int weekQ, int dayH[], float absH);
+bool import(string fileName, float& totH, int& weeklyH, int& weekQ, int dayH[], float& absH);
+int save(string fileName, float totH, int weeklyH, int weekQ, int dayH[], float absH);
 
 int main(){
 	const int width = 27;
+
 	const float absPerc = 25;//percentuale di assenze sulle ore totali che si possono fare
 
 	float totH = 0;//ore totali da fare in un anno
@@ -34,26 +42,33 @@ int main(){
 	
 	float posAbsH;//ore di assenza che si possono ancora fare
 	
-	const string percorsoFile = "assenze.txt";//percorso del file su cui eseguire i salvataggi
+	const string nomeFile = "assenze.txt";//percorso del file su cui eseguire i salvataggi
 
-	if(!import(percorsoFile, totH, weeklyH,	weekQ, dayH, absH)){
+	if(!import(nomeFile, totH, weeklyH,	weekQ, dayH, absH)){
 		schoolSetting(totH);
 		weekSetting(dayH, weekQ, weeklyH);
-		setAbsence(absH);
+		setAbsence(absH, totH);
 	}
 	
 	int i;
 	char command;
 	
 	do{
-		if(save(percorsoFile, totH, weeklyH, weekQ, dayH, absH) == 127){
+		system("cls");
+
+		if(save(nomeFile, totH, weeklyH, weekQ, dayH, absH) == 127){
 			cout << "Errore durante il salvataggio" << endl;
 			return 127;
 		}
 		
 		posAbsH = (totH * (absPerc / 100)) - absH;
 
+
 		cout << "___________________________\n|" << endl;
+		cout << "| " << "Ti sei assentato:" << endl;
+		cout << "| " << absH <<" ore" << endl;
+
+		cout << "|__________________________\n|" << endl;
 		cout << "| " << "Puoi ancora assentarti:" << endl;
 
 		cout << "| " << posAbsH <<" ore" << endl;
@@ -61,13 +76,17 @@ int main(){
 			cout << "| " << fixed << setprecision(1) << posAbsH / dayH[i] << " giorni da " << dayH[i] << " ore" << endl;
 		}
 		cout << "| " << posAbsH / weeklyH << " settimane" << "\n|__________________________"<< "\n\n";
-		cout << "Per visualizzare i comandi [h]" << "\n\n";
+
+		if(command != 'h'){
+			cout << "Per visualizzare i comandi [h]" << "\n\n";
+		}else{
+			menu();
+		}
 		
 		cin >> command;
 		
 		switch (command){
 			case 'h'://help
-				menu();
 				break;
 			case 'w'://week
 				weekSetting(dayH,weekQ,weeklyH);
@@ -76,13 +95,13 @@ int main(){
 				schoolSetting(totH);
 				break;
 			case 'a'://absence
-				setAbsence(absH);
+				setAbsence(absH, totH);
 				break;
 			case 'e'://exit
 				cout << "Arrivederci" << endl;
 				break;
 			case 'r'://reset
-				system(("rm " + percorsoFile).c_str());
+				system(("rm " + nomeFile).c_str());
 				cout << "Reset effettuato" << endl;
 				break;
 			case 'm'://mine mode
@@ -95,24 +114,46 @@ int main(){
 				command='z';
 				break;
 		}
-
-		
-
 	}while(command!='e'&&command!='r');
 
 return 0;
 }
 
-bool import(string filePath, float& totH, int& weeklyH, int& weekQ, int dayH[], float absH){
+//prende l'input dall'utente controllando che sia compreso nei valori dei parametri
+void check(int& inserimento, int min, int max){
+	
+	if(min < max){
+		cout << "\n";
+		do{
+			cout << "\033[F\033[K";
+			cin >> inserimento;
+		}while(inserimento < min || inserimento > max);
+	}
+return;
+}
+
+void check(float& inserimento, float min, float max){
+	
+	if(min < max){
+		cout << "\n";
+		do{
+			cout << "\033[F\033[K";
+			cin >> inserimento;
+		}while(inserimento < min || inserimento > max);
+	}
+return;
+}
+
+bool import(string fileName, float& totH, int& weeklyH, int& weekQ, int dayH[], float& absH){
 	bool used;
 	int i;
 	
 	fstream file;
 
-	file.open(filePath, ios :: in);
+	file.open(fileName, ios :: in);
 
 	if(!file.is_open()){
-		file.open(filePath, ios :: out);
+		file.open(fileName, ios :: out);
 		used = false;
 	} else if(file.peek() == EOF){
 		used = false;
@@ -133,11 +174,11 @@ bool import(string filePath, float& totH, int& weeklyH, int& weekQ, int dayH[], 
 return used;
 }
 
-int save(string filePath, float totH, int weeklyH, int weekQ, int dayH[], float absH){
+int save(string fileName, float totH, int weeklyH, int weekQ, int dayH[], float absH){
 	int i;
 	
 	fstream file;
-	file.open(filePath, ios :: out);
+	file.open(fileName, ios :: out);
 
 	if(!file.is_open()){
 		cout << "Errore apertura file in output"<<"\n\n";
@@ -157,9 +198,8 @@ int save(string filePath, float totH, int weeklyH, int weekQ, int dayH[], float 
 return 0;
 }
 
-void menu(){
-	system("cls");
-				
+//stampa i comandi disponibili
+void menu(){	
 	cout << "- w -> setta le ore di ogni giorno della settimana" << endl;
 	cout << "- s -> setta le ore totali dell'anno scolastico" << endl;
 	cout << "- a -> setta le ore di assenza effettuate fino ad ora" << endl;
@@ -176,17 +216,12 @@ void weekSetting(int difH[], int& Q, int& wlyH){
 	
 	system("cls");
 	
-	cout << "Inserisci quanti giorni a settimana vai a scuola:" << "\n\n";
-	do{
-		cin >> dayWeek;	
-	}while(dayWeek < 1 || dayWeek > 7);
-	
+	cout << "Inserisci quanti giorni a settimana vai a scuola:" << endl;
+	check(dayWeek, 1, 7);
 	
 	for(i = 0 ; i < dayWeek ; i++){
-		cout << "Inserisci quante ore fai di " << week(i) << ": " << "\n\n";
-		do{
-			cin >> H;	
-		}while(H < 1 || H > 24);
+		cout << "Inserisci quante ore fai di " << week(i) << endl;
+		check(H, 1, 24);
 		
 		wlyH+=H;
 		
@@ -213,46 +248,34 @@ void schoolSetting(float& H){
 	
 	system("cls");
 	
-	cout<<"Inserisci la scuola che frequenti:"<<endl;
-	
-	for(i=0;i<n;i++){
+	cout << "Inserisci la scuola che frequenti:" << endl;
+	for(i = 0 ; i < n ; i++){
 		cout << i + 1 << " - " << schName[i] << " (" << schH[i] << ")" << endl;
 	}
-	cout << "\n\n";
-	do{
-		cin >> opt;
-	}while(opt < 1 || opt > n);
-	
-	
+	check(opt, 1, n);
 	
 	opt--;
 	
 	if(opt == n - 1){
 		cout << "Inserisci le ore annuali totali:" << endl;
-		
-		do{
-			cin >> schH[opt];
-		}while(schH[opt] < 2);
+		check(schH[opt], 2, 8766);
 	}
 	
 	H = schH[opt];
-	
-	system("cls");
-	
 return;
 }
 
-void setAbsence(float& H){
+void setAbsence(float& H, float totH){
 	system("cls");
 	
 	cout << "Inserisci le ore di assenza fatte fino ad ora:" << endl;
-	cin >> H;
+	check(H, 0.0, totH);
 	
 return;
 }
 
+//restituisce il nome del giorno della settimana corrispondente all'indice inserito
 string week(int i){
 	string days[]{"lunedi", "martedi", "mercoledi", "giovedi", "venerdi", "sabato", "domenica"};
-	
 return days[i];
 }
