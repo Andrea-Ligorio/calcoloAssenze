@@ -10,72 +10,61 @@
 
 using namespace std;
 
+struct Assenza{
+	float totalH;
+	int weeklyH;
+	int weekQ;
+	float absenceH;
+	int dayH[7];
+};
+
 //restituisce il nome del giorno della settimana corrispondente all'indice inserito
 string week(int i);
 
-void home();
+void home(Assenza user);
 //stampa i comandi disponibili
 void menu();
 
 //prende l'input dall'utente controllando che sia compreso nei valori dei parametri
 void check(int& inserimento, int min, int max);
+void check(float& inserimento, float min, float max);
 
 //imposta 
-void weekSetting(int difH[], int& Q, int& wlyH);
+void weekSetting(int difH[], int& Q, int& weeklyH);
 void schoolSetting(float& H);
-void setAbsence(float& H, float totH);
+void setAbsence(float& H, float totalH);
 
-bool import(string fileName, float& totH, int& weeklyH, int& weekQ, int dayH[], float& absH);
-int save(string fileName, float totH, int weeklyH, int weekQ, int dayH[], float absH);
+bool import(string fileName, Assenza& user);
+int save(string fileName, Assenza& user);
 
 int main(){
+
+	Assenza user;
+
 	const int width = 27;
-
-	const float absPerc = 25;//percentuale di assenze sulle ore totali che si possono fare
-
-	float totH = 0;//ore totali da fare in un anno
-	float absH = 0;//ore di assenza fatte fino ad ora
 	
-	int weekQ = 0;//quantita di ore giornaliere diverse
-	int dayH[7];//array che salva ogni quantita giornaliera di ore diversa
-	int weeklyH = 0;//ore settimanali
-	
-	float posAbsH;//ore di assenza che si possono ancora fare
-	
-	const string nomeFile = "assenze.txt";//percorso del file su cui eseguire i salvataggi
+	const string nomeFile = "assenze.bin";//percorso del file su cui eseguire i salvataggi
 
-	if(!import(nomeFile, totH, weeklyH,	weekQ, dayH, absH)){
-		schoolSetting(totH);
-		weekSetting(dayH, weekQ, weeklyH);
-		setAbsence(absH, totH);
+	if(!import(nomeFile, user)){
+		schoolSetting(user.totalH);
+		weekSetting(user.dayH, user.weekQ, user.weeklyH);
+		setAbsence(user.absenceH, user.totalH);
 	}
 	
 	int i;
-	char command;
+	char command = 'z';
 	
 	do{
 		system("cls");
 
-		if(save(nomeFile, totH, weeklyH, weekQ, dayH, absH) == 127){
+		home(user);
+
+		if(save(nomeFile, user) == 127){
 			cout << "Errore durante il salvataggio" << endl;
 			return 127;
 		}
 		
-		posAbsH = (totH * (absPerc / 100)) - absH;
-
-
-		cout << "___________________________\n|" << endl;
-		cout << "| " << "Ti sei assentato:" << endl;
-		cout << "| " << absH <<" ore" << endl;
-
-		cout << "|__________________________\n|" << endl;
-		cout << "| " << "Puoi ancora assentarti:" << endl;
-
-		cout << "| " << posAbsH <<" ore" << endl;
-		for(i = 0 ; i < weekQ ; i++){
-			cout << "| " << fixed << setprecision(1) << posAbsH / dayH[i] << " giorni da " << dayH[i] << " ore" << endl;
-		}
-		cout << "| " << posAbsH / weeklyH << " settimane" << "\n|__________________________"<< "\n\n";
+		
 
 		if(command != 'h'){
 			cout << "Per visualizzare i comandi [h]" << "\n\n";
@@ -89,13 +78,13 @@ int main(){
 			case 'h'://help
 				break;
 			case 'w'://week
-				weekSetting(dayH,weekQ,weeklyH);
+				weekSetting(user.dayH, user.weekQ, user.weeklyH);
 				break;
 			case 's'://school
-				schoolSetting(totH);
+				schoolSetting(user.totalH);
 				break;
 			case 'a'://absence
-				setAbsence(absH, totH);
+				setAbsence(user.absenceH, user.totalH);
 				break;
 			case 'e'://exit
 				cout << "Arrivederci" << endl;
@@ -110,13 +99,37 @@ int main(){
 				}
 				break;
 			default:
-				cout<<"Comando non riconosciuto"<<endl;
-				command='z';
+				cout << "Comando non riconosciuto" << endl;
+				command = 'z';
 				break;
 		}
-	}while(command!='e'&&command!='r');
+	}while(command != 'e' && command != 'r');
 
 return 0;
+}
+
+void home(Assenza user){
+	const float absPerc = 25;
+	
+	float posAbsH;
+	int i;
+
+	posAbsH = (user.totalH * (absPerc / 100.0)) - user.absenceH;
+
+	cout << "___________________________\n|" << endl;
+	cout << "| " << "Ti sei assentato:" << endl;
+	cout << "| " << user.absenceH <<" ore" << endl;
+
+	cout << "|__________________________\n|" << endl;
+	cout << "| " << "Puoi ancora assentarti:" << endl;
+
+	cout << "| " << posAbsH <<" ore" << endl;
+	for(i = 0 ; i < user.weekQ ; i++){
+		cout << "| " << fixed << setprecision(1) << posAbsH / user.dayH[i] << " giorni da " << user.dayH[i] << " ore" << endl;
+	}
+	cout << "| " << posAbsH / user.weeklyH << " settimane" << "\n|__________________________"<< "\n\n";
+
+return;
 }
 
 //prende l'input dall'utente controllando che sia compreso nei valori dei parametri
@@ -144,28 +157,20 @@ void check(float& inserimento, float min, float max){
 return;
 }
 
-bool import(string fileName, float& totH, int& weeklyH, int& weekQ, int dayH[], float& absH){
+bool import(string fileName, Assenza& user){
 	bool used;
-	int i;
 	
 	fstream file;
 
-	file.open(fileName, ios :: in);
+	file.open(fileName, ios :: in | ios :: binary);
 
 	if(!file.is_open()){
-		file.open(fileName, ios :: out);
+		file.open(fileName, ios :: out | ios :: binary);
 		used = false;
 	} else if(file.peek() == EOF){
 		used = false;
 	} else{
-		file >> totH;
-		file >> weeklyH;
-		file >> weekQ;
-		for(i = 0 ; i < weekQ ; i++){
-			file >> dayH[i];
-		}
-		file >> absH;
-
+		file.read((char*)&user, sizeof(user));
 		used = true;
 	}
 
@@ -174,24 +179,18 @@ bool import(string fileName, float& totH, int& weeklyH, int& weekQ, int dayH[], 
 return used;
 }
 
-int save(string fileName, float totH, int weeklyH, int weekQ, int dayH[], float absH){
+int save(string fileName, Assenza& user){
 	int i;
 	
 	fstream file;
-	file.open(fileName, ios :: out);
+	file.open(fileName, ios :: out | ios :: binary);
 
 	if(!file.is_open()){
 		cout << "Errore apertura file in output"<<"\n\n";
 		return 127;
 	}
 
-	file << totH << endl;
-	file << weeklyH << endl;
-	file << weekQ << endl;
-	for(i = 0 ; i < weekQ ; i++){
-		file << dayH[i] << endl;
-	}
-	file << absH;
+	file.write((char*)&user,sizeof(user));
 
 	file.close();
 
@@ -209,7 +208,7 @@ void menu(){
 return;
 }
 
-void weekSetting(int difH[], int& Q, int& wlyH){
+void weekSetting(int difH[], int& Q, int& weeklyH){
 	int i, j, H;
 	int dayWeek;
 	bool flag;
@@ -219,11 +218,13 @@ void weekSetting(int difH[], int& Q, int& wlyH){
 	cout << "Inserisci quanti giorni a settimana vai a scuola:" << endl;
 	check(dayWeek, 1, 7);
 	
+	Q = 0;
+	weeklyH = 0;
+
 	for(i = 0 ; i < dayWeek ; i++){
 		cout << "Inserisci quante ore fai di " << week(i) << endl;
 		check(H, 1, 24);
-		
-		wlyH+=H;
+		weeklyH += H;
 		
 		for(j = 0, flag = false ; j < Q ; j++){
 			if(difH[j] == H){
@@ -265,11 +266,11 @@ void schoolSetting(float& H){
 return;
 }
 
-void setAbsence(float& H, float totH){
+void setAbsence(float& H, float totalH){
 	system("cls");
 	
 	cout << "Inserisci le ore di assenza fatte fino ad ora:" << endl;
-	check(H, 0.0, totH);
+	check(H, 0.0, totalH);
 	
 return;
 }
